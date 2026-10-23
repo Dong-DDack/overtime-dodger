@@ -1,0 +1,12 @@
+# Local development captures; README images belong in docs/screenshots/.
+/preview*.png
+
+# Editor / operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+.env
+.env.*

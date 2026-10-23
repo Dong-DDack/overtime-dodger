@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="17:59:30부터 딱 30초. 쏟아지는 업무를 리듬에 맞춰 피하고 정시 퇴근하세요. 오프라인 단일 파일 게임.">
+<title>칼퇴의 유혹 · Escape 18:00</title>
+<style>
+  :root { color-scheme:dark; font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif; background:#0d171d; color:#eef4ec; }
+  * { box-sizing:border-box; }
+  html,body { width:100%; height:100%; margin:0; }
+  body { display:grid; place-items:center; min-width:0; overflow:hidden; background:radial-gradient(ellipse at 50% 35%,#22383c 0%,#0d171d 75%); }
+  button { font:inherit; cursor:pointer; touch-action:manipulation; }
+  button:focus-visible { outline:3px solid #f4cc7a; outline-offset:3px; }
+  button:disabled { cursor:default; opacity:.4; }
+  .viewport { width:min(1280px,calc(100vw - 24px),calc((100dvh - 24px) * 16 / 9)); max-width:100%; max-height:calc(100dvh - 24px); aspect-ratio:16/9; position:relative; container-type:inline-size; overflow:hidden; border:1px solid #3a5357; border-radius:18px; background:#14272d; box-shadow:0 30px 90px #0006; }
+  html:fullscreen { background:#0d171d; }
+  html:fullscreen .viewport { width:min(calc(100vw - 16px),calc((100dvh - 16px) * 16 / 9)); max-height:calc(100dvh - 16px); border-radius:8px; }
+  .topbar { position:absolute; inset:0 0 auto; height:13.5%; display:flex; align-items:center; justify-content:space-between; padding:0 2.8%; border-bottom:1px solid #ffffff14; z-index:3; background:#14272d; }
+  .brand { display:flex; gap:1.1cqw; align-items:center; }
+  .brandmark { display:grid; place-items:center; width:3.3cqw; aspect-ratio:1; background:#c4f29b; color:#163b32; border-radius:10px; font-size:2.1cqw; font-weight:800; }
+  h1 { font-size:2.05cqw; letter-spacing:-.09cqw; margin:0; line-height:1.12; }
+  .eyebrow { font-size:.78cqw; color:#a1b6b5; letter-spacing:.18cqw; margin-top:.5cqw; }
+  .toolbar { display:flex; gap:.65cqw; align-items:center; }
+  .tool { border:1px solid #496165; color:#d4e2df; background:#20373d; padding:.7cqw .95cqw; border-radius:8px; font-size:.94cqw; white-space:nowrap; }
+  .tool[aria-pressed="true"] { border-color:#c4f29b; color:#c4f29b; }
+  .world { position:absolute; top:13.5%; left:0; width:100%; height:65.5%; }
+  canvas { display:block; width:100%; height:100%; object-fit:contain; }
+  .hud { position:absolute; top:17%; left:3%; right:3%; display:flex; align-items:flex-start; justify-content:space-between; pointer-events:none; z-index:5; }
+  .clock-block { padding:1cqw 1.4cqw; border:1px solid #8fa9a24d; border-radius:12px; background:#122a2ce8; box-shadow:0 6px 20px #0002; }
+  .clock-label { color:#b5c5b8; font-size:.8cqw; letter-spacing:.15cqw; }
+  .clock { font-family:ui-monospace,Consolas,monospace; font-variant-numeric:tabular-nums; color:#d2f7ad; font-weight:700; font-size:3.2cqw; letter-spacing:.08cqw; line-height:1.2; }
+  .status-block { text-align:right; }
+  .status { display:inline-block; font-size:1cqw; background:#142b30e8; border:1px solid #648079; border-radius:30px; padding:.45cqw 1cqw; }
+  .lives { font-size:1.2cqw; margin-top:.6cqw; color:#f7ce89; background:#142b30e8; border-radius:8px; padding:.55cqw .8cqw; }
+  .progress { position:absolute; top:76.9%; height:2.1%; left:0; right:0; background:#162b2f; z-index:2; }
+  .progress > div { height:100%; width:0; background:#c4f29b; }
+  .bottom { position:absolute; inset:79% 0 0; padding:1.3% 2.7%; background:#11252b; display:grid; grid-template-columns:1.12fr 2.4fr .92fr; gap:1.6%; align-items:center; z-index:3; }
+  .rules { font-size:.94cqw; line-height:1.7; color:#b8cac7; }
+  .rules strong { color:#eaf2e8; font-size:1.1cqw; }
+  .tiny { font-size:.79cqw; color:#8ea6a6; }
+  .keys { display:grid; grid-template-columns:repeat(4,1fr); gap:.65cqw; }
+  .key-guide { padding:.7cqw .3cqw; text-align:center; border:1px solid #395256; background:#1b3339; border-radius:10px; color:#e6eee8; min-width:0; }
+  .key-guide.active { background:#456845; border-color:#c4f29b; }
+  .key-guide span { display:block; font-size:1.7cqw; line-height:1.05; color:#d2f7ad; font-weight:750; }
+  .key-guide small { display:block; font-size:.83cqw; margin-top:.5cqw; white-space:nowrap; }
+  .records { text-align:right; font-size:.88cqw; line-height:1.85; color:#b8cac7; }
+  .records strong { color:#d2f7ad; font-size:1.2cqw; }
+  .overlay { position:absolute; inset:13.5% 0 21%; display:flex; justify-content:center; align-items:center; z-index:4; background:#0e232ac2; backdrop-filter:blur(5px); }
+  .overlay[hidden] { display:none; }
+  .panel { width:51%; padding:2.2cqw 2.7cqw; border:1px solid #748d7a80; border-radius:18px; background:linear-gradient(140deg,#233d40,#172d33); text-align:center; box-shadow:0 20px 70px #0005; }
+  .panel .kicker { font-size:.82cqw; letter-spacing:.25cqw; color:#c4f29b; }
+  h2 { margin:.9cqw 0; font-size:3.1cqw; line-height:1.15; letter-spacing:-.15cqw; }
+  .panel p { font-size:1.04cqw; color:#bacdc8; line-height:1.8; margin:.9cqw 0 1.3cqw; }
+  .panel b { color:#f5d08b; }
+  .primary { background:#c4f29b; border:1px solid #d8ffb8; color:#1b3c2c; font-weight:800; border-radius:9px; font-size:1.1cqw; padding:1cqw 2.1cqw; box-shadow:0 4px 0 #6c915a; }
+  .primary:hover { background:#dbffbc; }
+  .panel-foot { font-size:.78cqw; color:#9bb1ac; margin-top:1.2cqw; }
+  .difficulty { display:flex; align-items:center; justify-content:center; gap:.9cqw; margin:1.1cqw 0 1.4cqw; font-size:1cqw; color:#d2f7ad; }
+  .difficulty[hidden] { display:none; }
+  .difficulty select { font:inherit; color:#eff8e8; background:#203d40; border:1px solid #9ebc85; border-radius:7px; padding:.65cqw 1cqw; max-width:75%; }
+  .difficulty select:focus-visible { outline:3px solid #f4cc7a; outline-offset:2px; }
+  .feedback { position:absolute; left:25%; right:25%; top:59%; text-align:center; z-index:2; pointer-events:none; color:#d2f7ad; font-weight:800; font-size:1.65cqw; text-shadow:0 2px 5px #10242b; min-height:2cqw; }
+  .feedback[data-kind="miss"] { color:#ffc2a7; }
+  .cue { position:absolute; top:35%; left:27%; right:27%; text-align:center; z-index:2; pointer-events:none; color:#fff4d9; font-size:1.12cqw; font-weight:650; text-shadow:0 2px 5px #10242b; }
+  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; } }
+  @media (max-width:600px) { .viewport { border-radius:9px; } .tool,.key-guide,.clock-block { border-radius:4px; } }
+</style>
+</head>
+<body>
+<main class="viewport" aria-label="칼퇴의 유혹 리듬 회피 게임">
+  <header class="topbar">
+    <div class="brand"><div class="brandmark" aria-hidden="true">↗</div><div><h1>칼퇴의 유혹</h1><div class="eyebrow">ESCAPE 18:00 / OFFICE RHYTHM</div></div></div>
+    <nav class="toolbar" aria-label="게임 설정">
+      <button type="button" class="tool" id="pause" disabled>Ⅱ 일시정지</button>
+      <button type="button" class="tool" id="fullscreen" aria-pressed="false" title="전체화면으로 확대 · Esc로 나가기">⛶ 전체화면</button>
+      <button type="button" class="tool" id="mute" aria-pressed="false">소리 켜짐</button>
+      <button type="button" class="tool" id="motion" aria-pressed="false" title="화면 흔들림과 큰 이동을 줄입니다. 회피·방어는 정지 자세로 표시하며 판정과 속도는 같습니다.">움직임 줄이기</button>
+    </nav>
+  </header>
+  <div class="world"><canvas id="scene" width="960" height="354" role="img" aria-label="업무가 다가오는 사무실과 방향키 타이밍 트랙"></canvas></div>
+  <div class="hud">
+    <div class="clock-block"><div class="clock-label">OFFICE TIME · 퇴근까지 <span id="remaining">30.0</span>초</div><div class="clock" id="clock">17:59:30</div></div>
+    <div class="status-block"><div class="status" id="status">● 대기</div><div class="lives" id="lives">라이프 3 / 3 · 미스 0 / 3</div></div>
+  </div>
+  <div class="cue" id="cue">업무 알림이 판정선에 닿을 때 방향키!</div>
+  <div class="feedback" id="feedback" aria-hidden="true"></div>
+  <div class="progress" role="progressbar" aria-label="퇴근까지 진행 시간" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0" id="progress"><div id="progress-fill"></div></div>
+  <section class="bottom" aria-label="규칙 및 조작 가이드">
+    <div class="rules"><strong>딱 30초만 버티면, 퇴근.</strong><br>30초 생존 · 미스 3회 시 탈락<br><span class="tiny">방향 알림 → 판정선 → 해당 키 입력</span></div>
+    <div class="keys" aria-label="방향키 조작 안내">
+      <div class="key-guide" data-key="ArrowLeft"><span>←</span><small>오른쪽 접근 · 왼쪽 회피</small></div>
+      <div class="key-guide" data-key="ArrowUp"><span>↑</span><small>결재 서류 막기</small></div>
+      <div class="key-guide" data-key="ArrowRight"><span>→</span><small>왼쪽 접근 · 오른쪽 회피</small></div>
+      <div class="key-guide" data-key="ArrowDown"><span>↓</span><small>시선 피해 숙이기</small></div>
+    </div>
+    <div class="records">최장 생존 <strong id="best">0.0초</strong><br>퇴근 성공 <span id="clears">0</span>회<br><span class="tiny" id="storage-note">기록은 이 브라우저에 저장</span></div>
+  </section>
+  <section class="overlay" id="overlay" aria-labelledby="panel-title">
+    <div class="panel"><div class="kicker" id="panel-kicker">ONE LAST THING…</div><h2 id="panel-title">오늘은 꼭, 정시 퇴근.</h2><p id="panel-description">17:59:30. 퇴근까지 남은 시간은 단 30초.<br>쏟아지는 업무를 <b>방향키로 박자에 맞춰</b> 피하세요.<br>알림이 아래 판정선에 닿는 순간! 미스 3회면 야근입니다.</p>
+      <div class="difficulty" id="difficulty-row"><label for="difficulty">리듬 난이도</label><select id="difficulty">
+        <option value="0">Lv.1 여유롭게 · 60 BPM</option>
+        <option value="1" selected>Lv.2 가볍게 · 80 BPM</option>
+        <option value="2">Lv.3 바쁘게 · 100 BPM</option>
+        <option value="3">Lv.4 아슬아슬 · 120 BPM</option>
+        <option value="4">Lv.5 칼퇴 전쟁 · 150 BPM</option>
+      </select></div>
+      <div class="difficulty" id="character-row"><label for="character">플레이어</label><select id="character">
+        <option value="young_male" selected>젊은 남성 · 셔츠와 넥타이</option>
+        <option value="young_female">젊은 여성 · 블라우스와 포니테일</option>
+      </select></div>
+      <button type="button" class="primary" id="start">출근 말고, 퇴근 준비 →</button><div class="panel-foot" id="panel-foot">준비되면 시작 · 30초 생존 도전 · 외부 리소스 없는 오프라인 게임</div></div>
+  </section>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+</main>
+<script>
+'use strict';
+// [Difficulty Configuration] - T02-C20 난이도 단일 변수
+// 판정 허용 시간 윈도우 (밀리초 단위) - 테스트 시 이 값 하나만 조정함
+const DIFFICULTY_CONFIG = Object.freeze({
+  HIT_WINDOW_MS: 300 // A안 300ms → B안 200ms (판정 시각 전후 각각 허용)
+});
+
+// Core is independent of rendering, wall clocks, audio and storage for deterministic verification.
+// CORE_START
+const GAME_RULES = Object.freeze({ DURATION_MS:30000, MAX_MISSES:3, FIRST_HIT_MS:2250 });
+const DIFFICULTY_LEVELS = Object.freeze([
+  Object.freeze({name:'여유롭게',bpm:60}),
+  Object.freeze({name:'가볍게',bpm:80}),
+  Object.freeze({name:'바쁘게',bpm:100}),
+  Object.freeze({name:'아슬아슬',bpm:120}),
+  Object.freeze({name:'칼퇴 전쟁',bpm:150})
+]);
+const DIRECTIONS = Object.freeze(['ArrowLeft','ArrowUp','ArrowRight','ArrowDown']);
+const SYMBOLS = Object.freeze(['←','↑','→','↓']);
+// direction always means the player's INPUT/MOVEMENT, never the attack origin.
+const REQUESTS = Object.freeze(['오른쪽 동료 접근! ← 왼쪽으로 회피','서류 투척! ↑ 팔을 들어 막기','왼쪽 동료 접근! → 오른쪽으로 회피','시선 포착! ↓ 모니터 밑으로 숙이기']);
+function actionPose(direction, age, reduced) {
+  const t = reduced ? (direction===1 ? .66 : .53) : Math.max(0,Math.min(1,age/650));
+  const pose = { hipX:0,hipY:0,lean:0,headTilt:0,facing:0,leftFootX:-18,leftFootY:60,rightFootX:18,rightFootY:60,
+    leftHandX:-28,leftHandY:2,rightHandX:28,rightHandY:2,guard:0,recoil:0,blocking:direction===1,
+    paperX:480,paperY:78,paperRotation:0,paperAlpha:0,phase:'준비' };
+  if (direction===0 || direction===2) {
+    const sign = direction===0 ? -1 : 1;
+    // The leading foot lands before the pelvis arrives. The support foot stays planted.
+    pose.hipX = sign*motionCurve(t,[[0,0],[.12,2],[.33,17],[.52,37],[.67,36],[.86,15],[1,0]]);
+    pose.hipY = motionCurve(t,[[0,0],[.14,8],[.38,16],[.55,16],[.7,13],[1,0]]);
+    pose.lean = sign*motionCurve(t,[[0,0],[.14,.06],[.43,.25],[.64,.19],[.88,.04],[1,0]]);
+    pose.headTilt = -pose.lean*.35;
+    const step = motionCurve(t,[[0,18],[.13,18],[.36,67],[.7,67],[.9,34],[1,18]]);
+    const lift = motionCurve(t,[[0,0],[.13,0],[.24,13],[.38,0],[.7,0],[.84,11],[1,0]]);
+    if (sign<0) { pose.leftFootX=-step;pose.leftFootY=60-lift; }
+    else { pose.rightFootX=step;pose.rightFootY=60-lift; }
+    const balance = motionCurve(t,[[0,0],[.25,1],[.6,.8],[1,0]]);
+    pose.leftHandX -= sign*12*balance; pose.rightHandX -= sign*12*balance;
+    pose.leftHandY -= (sign<0?22:12)*balance; pose.rightHandY -= (sign>0?22:12)*balance;
+    pose.phase = t<.14?'준비 자세':t<.38?'발 디딤':t<.7?'체중 이동':'자세 복귀';
+  } else if (direction===1) {
+    const raise = motionCurve(t,[[0,0],[.23,1],[.36,1],[.48,.88],[.62,1.08],[.72,1],[1,0]]);
+    pose.guard = motionCurve(t,[[0,0],[.22,.85],[.34,1],[.65,.75],[.82,0],[1,0]]);
+    pose.recoil = motionCurve(t,[[0,0],[.34,0],[.45,1],[.62,0],[1,0]]);
+    pose.hipY = 7*pose.recoil; pose.lean = -.12*pose.recoil;
+    pose.headTilt = -.12*pose.recoil;
+    pose.leftHandX = -28+10*raise;pose.rightHandX = 28-10*raise;
+    pose.leftHandY = 2-72*raise;pose.rightHandY = 2-72*raise;
+    const incoming = motionCurve(t,[[0,0],[.34,1],[1,1]]);
+    const rebound = motionCurve(t,[[0,0],[.42,0],[1,1]]);
+    pose.paperX = 480+200*rebound;
+    pose.paperY = 78+76*incoming-153*rebound+35*rebound*rebound;
+    pose.paperRotation = -.15+rebound*4.3;
+    pose.paperAlpha = 1-motionCurve(t,[[0,0],[.8,0],[1,1]]);
+    pose.phase = t<.3?'팔 올리기':t<.49?'충격 흡수':t<.8?'서류 반사':'자세 복귀';
+  } else if (direction===3) {
+    const crouch = motionCurve(t,[[0,0],[.16,.2],[.42,1],[.64,1],[1,0]]);
+    pose.hipY = 32*crouch;pose.lean=.7*crouch;pose.headTilt=.2*crouch;
+    pose.leftFootX-=12*crouch;pose.rightFootX+=12*crouch;
+    pose.leftHandY-=35*crouch;pose.rightHandY-=38*crouch;
+    pose.phase = t<.2?'무릎 굽히기':t<.65?'시선 아래로':'자세 복귀';
+  }
+  // Compatibility aliases describe the pelvis rather than translating the whole figure.
+  pose.offsetX = pose.hipX; pose.duck = pose.hipY;
+  return pose;
+}
+
+function motionCurve(t, points) {
+  for (let i=1;i<points.length;i++) {
+    if (t<=points[i][0]) {
+      const a=points[i-1],b=points[i];
+      const u=Math.max(0,Math.min(1,(t-a[0])/(b[0]-a[0])));
+      const smooth=u*u*u*(u*(u*6-15)+10); // Zero velocity/acceleration at planted poses.
+      return a[1]+(b[1]-a[1])*smooth;
+    }
+  }
+  return points[points.length-1][1];
+}
+
+function blendPose(from,to,amount) {
+  const result={...to};
+  for (const key of ['hipX','hipY','lean','headTilt','leftFootX','leftFootY','rightFootX','rightFootY','leftHandX','leftHandY','rightHandX','rightHandY'])
+    result[key]=from[key]+(to[key]-from[key])*amount;
+  result.offsetX=result.hipX;result.duck=result.hipY;
+  return result;
+}
+
+// Two-bone IK keeps knees/elbows connected, even during interrupted or crouched poses.
+function solveLimb(root,target,upper,lower,bend) {
+  const dx=target.x-root.x,dy=target.y-root.y;
+  const length=Math.hypot(dx,dy);
+  const distance=Math.max(Math.abs(upper-lower)+.001,Math.min(upper+lower-.001,length));
+  const ux=length>.0001?dx/length:0,uy=length>.0001?dy/length:1;
+  const along=(upper*upper-lower*lower+distance*distance)/(2*distance);
+  const height=Math.sqrt(Math.max(0,upper*upper-along*along));
+  return {root, joint:{x:root.x+ux*along-uy*height*bend,y:root.y+uy*along+ux*height*bend},
+    end:{x:root.x+ux*distance,y:root.y+uy*distance}};
+}
+
+function skeleton(pose) {
+  const hip={x:pose.hipX,y:pose.hipY};
+  const shoulder={x:hip.x+Math.sin(pose.lean)*40,y:hip.y-Math.cos(pose.lean)*40};
+  const across={x:Math.cos(pose.lean),y:Math.sin(pose.lean)};
+  const width=pose.facing?13:17;
+  const leftShoulder={x:shoulder.x-across.x*width,y:shoulder.y-across.y*width};
+  const rightShoulder={x:shoulder.x+across.x*width,y:shoulder.y+across.y*width};
+  const hipWidth=pose.facing?5:10;
+  return {hip,shoulder,head:{x:shoulder.x+Math.sin(pose.lean)*20,y:shoulder.y-Math.cos(pose.lean)*20},
+    leftArm:solveLimb(leftShoulder,{x:hip.x+pose.leftHandX,y:hip.y+pose.leftHandY},25,25,-1),
+    rightArm:solveLimb(rightShoulder,{x:hip.x+pose.rightHandX,y:hip.y+pose.rightHandY},25,25,1),
+    leftLeg:solveLimb({x:hip.x-hipWidth,y:hip.y},{x:pose.leftFootX,y:pose.leftFootY},32,33,pose.facing?-1:1),
+    rightLeg:solveLimb({x:hip.x+hipWidth,y:hip.y},{x:pose.rightFootX,y:pose.rightFootY},32,33,-1)};
+}
+
+function walkingPose(distance,scale,reduced,running=false) {
+  const pose=actionPose(-1,0,false);
+  if (running) {pose.facing=1;pose.leftFootX=-8;pose.rightFootX=8;}
+  if (reduced) return pose;
+  const stride=running?80:64;
+  const phase=distance/(stride*scale);
+  function foot(offset) {
+    const cycle=((phase+offset)%1+1)%1;
+    const reach=stride*.3;
+    if (cycle<.6) return {x:reach-cycle*stride,y:60};
+    const swing=(cycle-.6)/.4;
+    return {x:-reach+2*reach*motionCurve(swing,[[0,0],[1,1]]),y:60-Math.sin(Math.PI*swing)*(running?17:12)};
+  }
+  const left=foot(0),right=foot(.5);
+  pose.leftFootX=(running?0:-13)+left.x;pose.leftFootY=left.y;
+  pose.rightFootX=(running?0:13)+right.x;pose.rightFootY=right.y;
+  pose.hipY=running?4+2*Math.sin(phase*Math.PI*4):-Math.sin(phase*Math.PI*4)*1.4;
+  const swing=Math.sin(phase*Math.PI*2);
+  pose.leftHandX-=swing*(running?17:9);pose.rightHandX+=swing*(running?17:9);
+  if (running) {pose.lean=.18;pose.leftHandY=-17-swing*8;pose.rightHandY=-17+swing*8;}
+  return pose;
+}
+
+class EscapeGame {
+  constructor(onEvent = () => {}, random = Math.random) {
+    this.onEvent = onEvent;
+    this.random = random;
+    this.reset();
+    this.state = 'waiting';
+  }
+  reset(levelIndex = this.difficultyIndex ?? 1) {
+    this.difficultyIndex = Number.isInteger(levelIndex) && levelIndex >= 0 && levelIndex < DIFFICULTY_LEVELS.length ? levelIndex : 1;
+    this.difficulty = DIFFICULTY_LEVELS[this.difficultyIndex];
+    this.beatMs = 60000 / this.difficulty.bpm;
+    this.approachMs = this.beatMs * 2.4;
+    this.effectMs = Math.min(720,this.beatMs*.9);
+    this.elapsed = 0;
+    this.misses = 0;
+    this.hits = 0;
+    this.perfects = 0;
+    this.combo = 0;
+    this.maxCombo = 0;
+    this.inputs = 0;
+    this.obstacles = [];
+    this.nextHit = GAME_RULES.FIRST_HIT_MS;
+    this.nextId = 0;
+    this.lastDirection = -1;
+    this.state = 'playing';
+    this.isPaused = false;
+  }
+  pause() {
+    if (this.state !== 'playing') return false;
+    this.state = 'paused';
+    this.isPaused = true;
+    return true;
+  }
+  resume() {
+    if (this.state !== 'paused') return false;
+    this.state = 'playing';
+    this.isPaused = false;
+    return true;
+  }
+  update(delta) {
+    if (this.state !== 'playing' || !Number.isFinite(delta) || delta <= 0) return;
+    const target = Math.min(GAME_RULES.DURATION_MS, this.elapsed + delta);
+    // Process expiry chronologically, so a third miss ends exactly at its deadline.
+    while (this.nextHit <= target + this.approachMs && this.nextHit <= GAME_RULES.DURATION_MS - 750) {
+      let direction = Math.floor(this.random() * 4) % 4;
+      if (direction === this.lastDirection) direction = (direction + 1) % 4;
+      this.lastDirection = direction;
+      this.obstacles.push({ id:this.nextId++, direction, hitAt:this.nextHit });
+      this.nextHit += this.beatMs;
+    }
+    while (this.obstacles.length && this.obstacles[0].hitAt + DIFFICULTY_CONFIG.HIT_WINDOW_MS < target) {
+      const obstacle = this.obstacles.shift();
+      this.elapsed = obstacle.hitAt + DIFFICULTY_CONFIG.HIT_WINDOW_MS;
+      this.miss(obstacle, 'late');
+      if (this.state !== 'playing') return;
+    }
+    this.elapsed = target;
+    if (this.elapsed >= GAME_RULES.DURATION_MS) this.finish('success');
+  }
+  input(key) {
+    if (this.state !== 'playing' || !DIRECTIONS.includes(key)) return false;
+    this.inputs++;
+    // One keydown consumes at most ONE pending obstacle. No queued inputs.
+    // At high BPM neighboring hit windows may overlap. Pick the nearest timestamp,
+    // independent of pressed direction, so one input still judges exactly one note.
+    let index = -1;
+    let nearest = DIFFICULTY_CONFIG.HIT_WINDOW_MS + 1;
+    for (let i=0;i<this.obstacles.length;i++) {
+      const distance = Math.abs(this.elapsed-this.obstacles[i].hitAt);
+      if (distance <= DIFFICULTY_CONFIG.HIT_WINDOW_MS && distance < nearest) { nearest = distance; index = i; }
+    }
+    if (index < 0) return false;
+    const obstacle = this.obstacles.splice(index,1)[0];
+    if (DIRECTIONS[obstacle.direction] !== key) {
+      this.miss(obstacle, 'wrong');
+      return true;
+    }
+    const offset = this.elapsed - obstacle.hitAt;
+    const perfect = Math.abs(offset) <= Math.min(90, DIFFICULTY_CONFIG.HIT_WINDOW_MS * .35);
+    this.hits++;
+    this.combo++;
+    this.maxCombo = Math.max(this.maxCombo, this.combo);
+    if (perfect) this.perfects++;
+    this.onEvent({ type:'dodge', direction:obstacle.direction, perfect, offset });
+    return true;
+  }
+  miss(obstacle, reason) {
+    this.misses++;
+    this.combo = 0;
+    this.onEvent({ type:'hit', direction:obstacle.direction, reason });
+    if (this.misses >= GAME_RULES.MAX_MISSES) this.finish('failure');
+  }
+  finish(state) {
+    if (this.state !== 'playing') return;
+    this.state = state;
+    this.isPaused = false;
+    this.obstacles.length = 0;
+    this.onEvent({ type:state });
+  }
+}
+
+const STORAGE_KEY = 'escape_1800_best';
+function defaultRecord() { return { bestTime:0, clearCount:0 }; }
+function validRecord(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) &&
+    typeof value.bestTime === 'number' && Number.isFinite(value.bestTime) && value.bestTime >= 0 && value.bestTime <= 30 &&
+    Number.isSafeInteger(value.clearCount) && value.clearCount >= 0;
+}
+function loadRecord(storage) {
+  const fallback = defaultRecord();
+  try {
+    const raw = storage.getItem(STORAGE_KEY);
+    if (raw === null) return { record:fallback, available:true };
+    const parsed = JSON.parse(raw);
+    if (!validRecord(parsed)) throw new TypeError('Invalid local record');
+    return { record:{ bestTime:parsed.bestTime, clearCount:parsed.clearCount }, available:true };
+  } catch (_) {
+    // Invalid JSON, invalid schema, private mode, blocked storage: all are recoverable.
+    try { storage.setItem(STORAGE_KEY, JSON.stringify(fallback)); return { record:fallback, available:true }; }
+    catch (_) { return { record:fallback, available:false }; }
+  }
+}
+function saveRecord(storage, record) {
+  try { storage.setItem(STORAGE_KEY, JSON.stringify(record)); return true; }
+  catch (_) { return false; }
+}
+// CORE_END
+
+(() => {
+  const $ = id => document.getElementById(id);
+  const canvas = $('scene');
+  const ctx = canvas.getContext('2d');
+  const elements = Object.fromEntries(['clock','remaining','status','lives','cue','feedback','progress','progress-fill','best','clears','storage-note','overlay','panel-title','panel-description','panel-kicker','panel-foot','difficulty','difficulty-row','character','character-row','start','pause','fullscreen','mute','motion','announcement'].map(id => [id,$(id)]));
+  let selectedDifficulty = 1;
+  let selectedCharacter = 'young_male';
+  let playerCharacter = 'young_male';
+  const guides = Array.from(document.querySelectorAll('.key-guide'));
+  let storage;
+  try { storage = window.localStorage; } catch (_) { storage = null; }
+  const loaded = loadRecord(storage);
+  let record = loaded.record;
+  let storageAvailable = loaded.available;
+  let lastTime = performance.now();
+  let rafId = 0;
+  let destroyed = false;
+  let reducedMotion = false;
+  const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  reducedMotion = motionPreference.matches;
+  let motionOverridden = false;
+  let muted = false;
+  let audioContext = null;
+  let masterGain = null;
+  let audioPending = false;
+  let audioReady = false;
+  const heldKeys = new Set();
+  // A single visual event replaces the previous one; no unbounded particle or sound arrays.
+  let effect = null;
+  let terminalAt = 0;
+  let terminalPose = actionPose(-1,0,false);
+  let finalOverlayShown = false;
+  let uiSnapshot = '';
+
+  function ensureAudio() {
+    if (audioPending) return;
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+        masterGain = audioContext.createGain();
+        masterGain.gain.value = muted ? 0 : .13;
+        masterGain.connect(audioContext.destination);
+      }
+      if (audioContext.state === 'suspended') {
+        audioPending = true;
+        audioContext.resume().then(() => { audioReady = audioContext.state === 'running'; }).catch(() => { audioReady = false; }).finally(() => { audioPending = false; });
+      } else audioReady = audioContext.state === 'running';
+    } catch (_) { audioReady = false; }
+  }
+
+  function sound(type, direction = 0) {
+    // Only the four declared events call this. No audio on frames, inputs, pause or toggles.
+    if (!audioReady || !audioContext || !masterGain || muted || audioContext.state !== 'running') return;
+    try {
+      const now = audioContext.currentTime;
+      const tones = type === 'success' ? [523.25,659.25,783.99] : type === 'failure' ? [220,164.81,110] :
+        [type === 'hit' ? 100 : [329.63,523.25,392,261.63][direction]];
+      tones.forEach((frequency,index) => {
+        const oscillator = audioContext.createOscillator();
+        const envelope = audioContext.createGain();
+        const start = now + index * .11;
+        oscillator.type = type === 'hit' || type === 'failure' ? 'triangle' : 'sine';
+        oscillator.frequency.setValueAtTime(frequency,start);
+        envelope.gain.setValueAtTime(0,start);
+        envelope.gain.linearRampToValueAtTime(.75,start + .008);
+        envelope.gain.exponentialRampToValueAtTime(.001,start + .13);
+        oscillator.connect(envelope);
+        envelope.connect(masterGain);
+        oscillator.onended = () => { oscillator.disconnect(); envelope.disconnect(); oscillator.onended = null; };
+        oscillator.start(start);
+        oscillator.stop(start + .15);
+      });
+    } catch (_) { audioReady = false; }
+  }
+
+  const game = new EscapeGame(event => {
+    if (event.type === 'dodge' || event.type === 'hit') {
+      const fromPose = playerPoseAt(game.elapsed);
+      effect = { ...event, at:game.elapsed, fromPose,
+        paperStartY:40+85*Math.max(0,Math.min(1,1+(event.offset||0)/game.approachMs)) };
+      sound(event.type,event.direction);
+      elements.announcement.textContent = event.type === 'dodge' ? '회피 성공' : `미스 ${game.misses}회, 남은 라이프 ${3-game.misses}`;
+    } else {
+      terminalAt = performance.now();
+      terminalPose = playerPoseAt(game.elapsed);
+      effect = null;
+      sound(event.type);
+      record.bestTime = Math.max(record.bestTime, Math.min(30,game.elapsed / 1000));
+      if (event.type === 'success') record.clearCount = Math.min(Number.MAX_SAFE_INTEGER,record.clearCount + 1);
+      storageAvailable = saveRecord(storage,record);
+      elements.announcement.textContent = event.type === 'success' ? '18시! 정시 퇴근 성공!' : '미스 3회. 야근 확정.';
+      renderHUD();
+    }
+  });
+
+  function renderHUD() {
+    const seconds = Math.min(30,Math.floor(game.elapsed / 1000));
+    elements.clock.textContent = seconds === 30 ? '18:00:00' : `17:59:${String(30+seconds).padStart(2,'0')}`;
+    elements.remaining.textContent = (Math.max(0,30000-game.elapsed)/1000).toFixed(1);
+    const states = { waiting:'대기', playing:'진행중', paused:'일시정지', success:'성공', failure:'실패' };
+    const displayIndex = game.state === 'waiting' ? selectedDifficulty : game.difficultyIndex;
+    elements.status.textContent = `● ${states[game.state]} · Lv.${displayIndex+1} · ${DIFFICULTY_LEVELS[displayIndex].bpm} BPM`;
+    elements.lives.textContent = `라이프 ${3-game.misses} / 3 · 미스 ${game.misses} / 3`;
+    elements['progress-fill'].style.width = `${game.elapsed / 300}%`;
+    elements.progress.setAttribute('aria-valuenow',(game.elapsed / 1000).toFixed(1));
+    elements.best.textContent = `${record.bestTime.toFixed(1)}초`;
+    elements.clears.textContent = String(record.clearCount);
+    elements['storage-note'].textContent = storageAvailable ? '기록은 이 브라우저에 저장' : '저장 불가 · 현재 창에서 기록 유지';
+    elements.pause.disabled = !['playing','paused'].includes(game.state);
+    elements.pause.textContent = game.isPaused ? '▶ 재개' : 'Ⅱ 일시정지';
+    const obstacle = game.obstacles[0];
+    const age = effect ? game.elapsed - effect.at : 9999;
+    const activeEffect = effect && age < game.effectMs;
+    const actionResults = ['← 왼쪽으로 피했어요!','↑ 방어 성공! 서류를 튕겨냈어요!','→ 오른쪽으로 피했어요!','↓ 숙여서 시선을 피했어요!'];
+    elements.cue.textContent = game.state === 'playing' && activeEffect && age<Math.min(260,game.beatMs*.35) ? effect.type === 'dodge' ? actionResults[effect.direction] : '업무에 붙잡혔어요 · 다음 박자를 준비하세요' :
+      game.state === 'playing' && obstacle ? `${SYMBOLS[obstacle.direction]} ${REQUESTS[obstacle.direction]}` :
+      game.state === 'success' ? '18:00:00 · 오늘 업무 종료!' : game.state === 'failure' ? '퇴근 버튼 대신… 야근 버튼.' :
+      game.state === 'paused' ? '시간이 멈췄습니다 · 준비되면 재개하세요' : '업무 알림이 판정선에 닿을 때 방향키!';
+    elements.feedback.textContent = activeEffect ? effect.type === 'hit' ? 'MISS · 업무에 붙잡혔어요' : `${effect.perfect ? 'PERFECT' : 'GOOD'} · ${game.combo} COMBO` : '';
+    elements.feedback.dataset.kind = activeEffect && effect.type === 'hit' ? 'miss' : 'dodge';
+    guides.forEach((guide,index) => guide.classList.toggle('active',!!(activeEffect && effect.type === 'dodge' && effect.direction === index)));
+  }
+
+  function showPanel(kind) {
+    const paused = kind === 'paused';
+    elements['difficulty-row'].hidden = paused;
+    elements.difficulty.disabled = paused;
+    elements['character-row'].hidden = paused;
+    elements.character.disabled = paused;
+    const success = kind === 'success';
+    elements['panel-kicker'].textContent = paused ? 'TAKE A BREATH' : success ? 'YOU ARE OFF THE CLOCK' : 'ONE MORE THING… AGAIN';
+    elements['panel-title'].textContent = paused ? '잠깐, 숨 고르기.' : success ? '퇴근하겠습니다!' : '오늘도… 야근 확정.';
+    elements['panel-description'].textContent = paused ? '게임 시간과 업무 알림을 모두 멈췄어요. 준비되면 직접 재개하세요.' :
+      success ? '18:00:00. 문을 박차고 나왔습니다. 오늘 저녁은 온전히 당신의 시간이에요.' : '미스 3회! 책상에 쌓인 서류가 퇴근을 막았습니다. 다음에는 박자를 노려보세요.';
+    elements['panel-foot'].textContent = paused ? '다른 창으로 이동하면 자동 일시정지 · 복귀 후 자동 재개하지 않음' :
+      `Lv.${game.difficultyIndex+1} · ${game.difficulty.bpm} BPM · 생존 ${(game.elapsed/1000).toFixed(2)}초 · 회피 ${game.hits}회 · 최대 콤보 ${game.maxCombo}`;
+    elements.start.textContent = paused ? '▶ 이어서 퇴근 도전' : '다시 시작 →';
+    elements.overlay.hidden = false;
+    if (!paused) elements.start.focus({ preventScroll:true });
+  }
+
+  function startGame() {
+    if (document.hidden || !document.hasFocus()) return;
+    ensureAudio();
+    game.reset(selectedDifficulty);
+    playerCharacter = selectedCharacter;
+    heldKeys.clear();
+    effect = null;
+    finalOverlayShown = false;
+    terminalAt = 0;
+    lastTime = performance.now();
+    uiSnapshot = '';
+    elements.overlay.hidden = true;
+    elements.announcement.textContent = '시작! 30초 동안 방향키로 업무를 회피하세요.';
+    elements.start.blur();
+    renderHUD();
+  }
+  function pauseGame() {
+    if (!game.pause()) return;
+    heldKeys.clear();
+    lastTime = performance.now();
+    showPanel('paused');
+    renderHUD();
+  }
+  function resumeGame() {
+    if (document.hidden || !document.hasFocus()) return;
+    ensureAudio();
+    if (!game.resume()) return;
+    lastTime = performance.now(); // Discard paused wall time. No catch-up, no overdue obstacles.
+    heldKeys.clear();
+    elements.overlay.hidden = true;
+    elements.start.blur();
+    renderHUD();
+  }
+  function advance(now) {
+    const delta = Math.max(0,now-lastTime);
+    lastTime = now;
+    if (game.state !== 'playing') return;
+    // A suspended main thread must not cause a burst of instant misses.
+    if (delta > 250) { pauseGame(); return; }
+    game.update(delta);
+  }
+
+  function onKeyDown(event) {
+    if (!DIRECTIONS.includes(event.key)) return;
+    // Keep native select keyboard navigation available on waiting/result screens.
+    if ((event.target === elements.difficulty || event.target === elements.character) && !['playing','paused'].includes(game.state)) return;
+    event.preventDefault(); // Never scroll or move focused button controls with game keys.
+    if (event.repeat || heldKeys.has(event.key)) return;
+    heldKeys.add(event.key);
+    if (game.state !== 'playing') return;
+    advance(performance.now()); // Input and visuals use exactly the same monotonic clock.
+    if (game.state !== 'playing') return;
+    game.input(event.key);
+    renderHUD();
+  }
+  function onKeyUp(event) { heldKeys.delete(event.key); }
+  function onBlur() { heldKeys.clear(); pauseGame(); }
+  function onVisibility() { if (document.hidden) onBlur(); }
+  function onStart() { game.state === 'paused' ? resumeGame() : startGame(); }
+  function onPause() { game.state === 'playing' ? pauseGame() : resumeGame(); }
+  function onDifficulty() {
+    const value = Number(elements.difficulty.value);
+    if (['playing','paused'].includes(game.state) || !Number.isInteger(value) || !DIFFICULTY_LEVELS[value]) return;
+    selectedDifficulty = value;
+    renderHUD();
+    elements.announcement.textContent = `난이도 ${value+1}단계 ${DIFFICULTY_LEVELS[value].name}, ${DIFFICULTY_LEVELS[value].bpm} BPM. 다음 게임에 적용됩니다.`;
+  }
+  function onCharacter() {
+    if (['playing','paused'].includes(game.state)) return;
+    if (!['young_male','young_female'].includes(elements.character.value)) return;
+    selectedCharacter = elements.character.value;
+    elements.announcement.textContent = `${selectedCharacter==='young_male'?'젊은 남성':'젊은 여성'} 캐릭터를 선택했습니다. 다음 게임에 적용됩니다.`;
+  }
+  let fullscreenPending = false;
+  function syncFullscreen() {
+    const active = !!document.fullscreenElement;
+    elements.fullscreen.setAttribute('aria-pressed',String(active));
+    elements.fullscreen.textContent = active ? '⛶ 화면 복원' : '⛶ 전체화면';
+  }
+  async function onFullscreen() {
+    if (fullscreenPending) return;
+    fullscreenPending = true;
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+      else throw new Error('Fullscreen unavailable');
+    } catch (_) {
+      elements.announcement.textContent = '이 브라우저에서는 전체화면 요청이 허용되지 않습니다. 일반 브라우저에서 열거나 F11을 사용하세요.';
+      elements.fullscreen.title = elements.announcement.textContent;
+    } finally { fullscreenPending = false; syncFullscreen(); }
+  }
+  function syncMotionButton() { elements.motion.setAttribute('aria-pressed',String(reducedMotion)); }
+  function onMotion() { motionOverridden = true; reducedMotion = !reducedMotion; syncMotionButton(); }
+  function onMotionPreference(event) { if (!motionOverridden) { reducedMotion = event.matches; syncMotionButton(); } }
+  function onMute() {
+    muted = !muted;
+    if (masterGain && audioContext) {
+      masterGain.gain.cancelScheduledValues(audioContext.currentTime);
+      masterGain.gain.setValueAtTime(muted ? 0 : .13,audioContext.currentTime);
+    }
+    elements.mute.textContent = muted ? '음소거 켜짐' : '소리 켜짐';
+    elements.mute.setAttribute('aria-pressed',String(muted));
+  }
+
+  // Canvas artwork uses only paths, rectangles, circles and local system text.
+  function rect(x,y,w,h,color,radius = 0) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    if (radius) ctx.roundRect(x,y,w,h,radius); else ctx.rect(x,y,w,h);
+    ctx.fill();
+  }
+  function line(x1,y1,x2,y2,color,width = 1) {
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  }
+  function circle(x,y,r,color) { ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
+  function text(value,x,y,size,color,align = 'center') {
+    ctx.fillStyle = color; ctx.textAlign = align; ctx.font = `600 ${size}px system-ui, sans-serif`; ctx.fillText(value,x,y);
+  }
+  function paper(x,y,rotation = 0) {
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rotation); rect(-16,-19,32,39,'#f6e8c5',2);
+    for (let i=0;i<3;i++) line(-10,-8+i*7,9,-8+i*7,'#ad977d',2);
+    ctx.restore();
+  }
+  function playerPoseAt(time) {
+    const age = effect ? time-effect.at : Infinity;
+    let pose = actionPose(-1,0,false);
+    if (effect && age<game.effectMs) {
+      if (effect.type==='dodge') pose=actionPose(effect.direction,age/game.effectMs*650,reducedMotion);
+      else if (!reducedMotion) {
+        const recoil=Math.sin(Math.PI*Math.max(0,age/game.effectMs));
+        pose.hipY=4*recoil;pose.lean=.14*recoil;
+      }
+      if (!reducedMotion && effect.fromPose) {
+        const blend=motionCurve(age/game.effectMs,[[0,0],[.18,1],[1,1]]);
+        pose=blendPose(effect.fromPose,pose,blend);
+      }
+    }
+    return pose;
+  }
+
+  function face(x,y,style,angle=0,profile=false) {
+    const female=style==='young_female'||style==='coworker_female';
+    const senior=style==='senior';
+    const hair=senior?'#d6d9d2':female?'#49372f':'#293338';
+    ctx.save();ctx.translate(x,y);ctx.rotate(angle);
+    // Hair silhouette, shaped jaw, eyebrows and nose replace the plain circular face.
+    if (female) {
+      ctx.fillStyle=hair;ctx.beginPath();ctx.ellipse(0,0,16,20,0,0,Math.PI*2);ctx.fill();
+      if (style==='young_female') {ctx.beginPath();ctx.ellipse(-17,7,7,19,-.3,0,Math.PI*2);ctx.fill();circle(-15,-1,3,'#bacb96');}
+      else rect(-16,0,32,22,hair,7);
+    }
+    circle(-13,2,3,'#d7a582');circle(13,2,3,'#d7a582');
+    ctx.fillStyle=senior?'#dfb48f':'#eac3a0';ctx.beginPath();
+    ctx.moveTo(-13,-7);ctx.quadraticCurveTo(-15,7,-8,13);ctx.quadraticCurveTo(0,20,8,13);
+    ctx.quadraticCurveTo(15,7,13,-7);ctx.quadraticCurveTo(0,-22,-13,-7);ctx.fill();
+    ctx.fillStyle=hair;ctx.beginPath();ctx.moveTo(-14,0);ctx.quadraticCurveTo(-19,-17,-3,-17);
+    ctx.quadraticCurveTo(14,-20,15,-5);ctx.lineTo(9,-6);ctx.lineTo(5,-11);ctx.quadraticCurveTo(-3,-4,-11,-5);ctx.closePath();ctx.fill();
+    if(senior){line(-11,-9,10,-9,'#f2f1df',2);line(-10,-5,-6,-4,'#9f8068',.8);line(4,-4,10,-5,'#9f8068',.8);}
+    const look=profile?3:0;
+    line(-8+look,-1,-3+look,-2,hair,1.4);line(3+look,-2,8+look,-1,hair,1.4);
+    circle(-5+look,3,1.4,'#253436');circle(5+look,3,1.4,'#253436');
+    line(look,4,look-1,8,'#bb896c',.9);line(look-1,8,look+2,8,'#bb896c',.9);
+    line(-3+look,12,3+look,12,female?'#a65c58':'#a46f5b',1.1);
+    if(female){line(-8+look,3,-6+look,2,'#49372f',.8);line(6+look,2,8+look,3,'#49372f',.8);}
+    if(senior){
+      for(const side of [-1,1]){line(side*8,5,side*12,7,'#a07961',.85);line(side*8,7,side*11,9,'#a07961',.8);}
+      line(-8,10,-6,13,'#a07961',.8);line(7,10,6,13,'#a07961',.8);
+      line(-6,-5,6,-5,'#af886d',.7);line(-5,-7,5,-7,'#af886d',.7);
+    }
+    ctx.restore();
+  }
+
+  function character(x,y,pose,shirt,scale=1,style='coworker_male') {
+    const player=style==='young_male'||style==='young_female';
+    const female=style==='young_female'||style==='coworker_female';
+    const rig=skeleton(pose);
+    ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+    ctx.fillStyle='#122c3238';ctx.beginPath();ctx.ellipse(pose.hipX,63,35,5,0,0,Math.PI*2);ctx.fill();
+    ctx.lineCap='round';ctx.lineJoin='round';
+    function limb(bone,upperColor,lowerColor,width) {
+      line(bone.root.x,bone.root.y,bone.joint.x,bone.joint.y,'#1c343b',width+3);
+      line(bone.joint.x,bone.joint.y,bone.end.x,bone.end.y,'#1c343b',width+2);
+      line(bone.root.x,bone.root.y,bone.joint.x,bone.joint.y,upperColor,width);
+      line(bone.joint.x,bone.joint.y,bone.end.x,bone.end.y,lowerColor,width-1);
+      circle(bone.joint.x,bone.joint.y,width*.45,upperColor);
+    }
+    limb(rig.leftLeg,'#34505c','#2b414d',11);
+    limb(rig.rightLeg,'#405b67','#304751',11);
+    for (const [leg,side] of [[rig.leftLeg,-1],[rig.rightLeg,1]]) {
+      rect(leg.end.x-7+(side<0?-4:0),leg.end.y-3,18,7,'#172d35',3);
+      line(leg.end.x-5,leg.end.y+4,leg.end.x+8,leg.end.y+4,'#8a9c98',1.5);
+    }
+    limb(rig.leftArm,shirt,'#e8bf98',9);
+    // Torso is a shoulder-to-pelvis shape, with a separate neck and head rotation.
+    ctx.fillStyle=shirt;ctx.beginPath();
+    ctx.moveTo(rig.leftArm.root.x-2,rig.leftArm.root.y);
+    ctx.lineTo(rig.rightArm.root.x+2,rig.rightArm.root.y);
+    ctx.lineTo(rig.hip.x+15,rig.hip.y+3);ctx.lineTo(rig.hip.x-15,rig.hip.y+3);ctx.closePath();ctx.fill();
+    line(rig.hip.x-14,rig.hip.y+2,rig.hip.x+14,rig.hip.y+2,'#213f49',4);
+    line(rig.shoulder.x,rig.shoulder.y+1,rig.head.x,rig.head.y+10,'#e8bf98',9);
+    line(rig.shoulder.x,rig.shoulder.y+6,rig.hip.x,rig.hip.y-3,player?'#aec7b4':'#b5a696',1);
+    line(rig.shoulder.x-9,rig.shoulder.y+1,rig.shoulder.x,rig.shoulder.y+10,'#f0eee2',2.5);
+    line(rig.shoulder.x+9,rig.shoulder.y+1,rig.shoulder.x,rig.shoulder.y+10,'#f0eee2',2.5);
+    if (!female) line(rig.shoulder.x,rig.shoulder.y+10,rig.hip.x,rig.hip.y-12,player?'#497369':'#796b4d',4);
+    else {line(rig.shoulder.x-9,rig.shoulder.y+9,rig.hip.x-5,rig.hip.y-15,'#6c8281',1.2);rect(rig.hip.x-9,rig.hip.y-16,9,12,'#ece8ce',2);}
+    for(let i=0;i<3;i++)circle(rig.shoulder.x+(rig.hip.x-rig.shoulder.x)*(i+1)/4,rig.shoulder.y+14+i*6,1,'#f0f3de');
+    limb(rig.rightArm,shirt,'#e8bf98',9);
+    circle(rig.leftArm.end.x,rig.leftArm.end.y,5,'#efc8a2');
+    circle(rig.rightArm.end.x,rig.rightArm.end.y,5,'#efc8a2');
+    face(rig.head.x,rig.head.y,style,pose.lean*.35+pose.headTilt,!!pose.facing);
+    ctx.restore();
+    return rig;
+  }
+  function drawScene(now) {
+    if (!ctx) return;
+    ctx.clearRect(0,0,960,354);
+    const terminal = game.state === 'success' || game.state === 'failure';
+    const ending = terminal ? Math.min(1,(now-terminalAt)/(game.state==='success'?2200:900)) : 0;
+    const endMotion = reducedMotion ? 1 : ending;
+    const age = effect ? game.elapsed-effect.at : 9999;
+    const active = !!effect && age < game.effectMs;
+    const dodge = active && effect.type === 'dodge';
+    const actionAge = age / game.effectMs * 650;
+    const pose = playerPoseAt(game.elapsed);
+    const amplitude = active && age < 360 && !reducedMotion ? Math.sin(age/30)*(1-age/360)*4 : 0;
+    ctx.save();
+    if (active && effect.type === 'hit' && !reducedMotion) ctx.translate(amplitude,0);
+    rect(0,0,960,354,'#536e6c');
+    rect(0,210,960,144,'#314c4c');
+    // Sunset window and skyline.
+    const sky = ctx.createLinearGradient(650,0,650,205);
+    sky.addColorStop(0,'#ecbf88'); sky.addColorStop(1,'#f3d6ad');
+    rect(655,17,235,173,sky,2);
+    circle(816,73,29,'#ffe8b4');
+    for (let i=0;i<8;i++) rect(661+i*30,123-(i%3)*15,25,67+(i%3)*15,'#acb5a1');
+    line(768,17,768,190,'#314d4e',7); line(655,105,890,105,'#314d4e',7);
+    rect(645,190,255,8,'#d2c8ac');
+    // Wall notice and clock.
+    rect(354,21,178,59,'#d0d5bb',4); text('퇴근은 권리다',443,49,17,'#3d5e55'); text('오늘도 수고했어요',443,68,10,'#688279');
+    // Exit door is also the ending destination.
+    rect(903,75,51,143,'#1c3d3d',3); rect(908,80,41,131,'#426c5b',2); text('EXIT',928,101,10,'#d3f6ad');
+    circle(942,151,3,'#efcd7e');
+    if (game.state==='success') rect(908,106,41,105,'#d5f3ab');
+    // Colleagues and partitions.
+    const next = game.obstacles[0];
+    const encounterDirection = dodge ? effect.direction : next ? next.direction : -1;
+    const threat = dodge ? 1 : next ? Math.max(0,Math.min(1,1-(next.hitAt-game.elapsed)/game.approachMs)) : 0;
+    // Reduced motion holds a clear warning pose; the timing notes still move for gameplay.
+    const approach = reducedMotion ? .72 : threat;
+    const leftThreat = encounterDirection===2;
+    const rightThreat = encounterDirection===0;
+    const leftX = 125 + (leftThreat ? approach*250 : 0);
+    const rightX = 835 - (rightThreat ? approach*250 : 0);
+    rect(55,184,206,23,'#b1b8a1',3); rect(74,207,12,69,'#283f40'); rect(232,207,12,69,'#283f40');
+    rect(735,184,161,23,'#b1b8a1',3); rect(748,207,12,69,'#283f40'); rect(871,207,12,69,'#283f40');
+    paper(218,176,-.15); paper(776,172,.12);
+    face(480,encounterDirection===3?119:129,'senior');
+    rect(300,146,355,54,'#738b7b',5); line(300,154,655,154,'#93a28b',3);
+    function coworker(x,side,attacking) {
+      const p = attacking ? approach : 0;
+      const y = 197+p*21;
+      const scale=.8+p*.2;
+      const walking=attacking?walkingPose((side==='left'?1:-1)*p*250,scale,reducedMotion):actionPose(-1,0);
+      walking.lean=(side==='left'?1:-1)*.07*p;
+      if (attacking) {
+        const offer=motionCurve(p,[[0,0],[.4,.2],[.85,1],[1,1]]);
+        if (side==='left') { walking.rightHandX=28+17*offer;walking.rightHandY=2-31*offer; }
+        else { walking.leftHandX=-28-17*offer;walking.leftHandY=2-31*offer; }
+      }
+      const rig=character(x,y,walking,side==='left'?'#ae7b67':'#909867',scale,side==='left'?'coworker_female':'coworker_male');
+      if (attacking) {
+        const hand=side==='left'?rig.rightArm.end:rig.leftArm.end;
+        paper(x+hand.x*scale,y+hand.y*scale-13,side==='left'?.15:-.15);
+        rect(x-61,y-111,122,23,'#f2cf94',7); text('이것 좀 부탁해!',x,y-95,12,'#493c31');
+        text(side==='left'?'왼쪽에서 접근 →':'← 오른쪽에서 접근',x,y+78,11,'#ffdfab');
+      }
+    }
+    coworker(leftX,'left',leftThreat); coworker(rightX,'right',rightThreat);
+    if (!dodge && encounterDirection === 1) {
+      const p = reducedMotion ? .7 : threat;
+      for (let i=2;i>=0;i--) paper(480+(i-1)*12,40+p*85-i*7,(i-1)*.18+p*.3);
+      text('결재 서류 투척 ↓',480,112,14,'#ffe0a5');
+      line(480,121,480,145,'#f5cf8e',3);
+    }
+    // Workstation, player and contextual dodge poses.
+    let playerOrigin = 480;
+    let playerY=225, playerScale=1;
+    let visiblePose=pose;
+    if (game.state==='success') {
+      const travel=motionCurve(endMotion,[[0,0],[1,1]]);
+      playerOrigin+=449*travel;
+      playerY-=57*travel;playerScale-=.28*travel;
+      const run=walkingPose(449*travel,1,reducedMotion,true);
+      const standing=actionPose(-1,0);standing.facing=1;
+      standing.leftFootX=-8;standing.rightFootX=8;
+      visiblePose=blendPose(terminalPose,run,Math.min(1,endMotion/.18));
+      visiblePose=blendPose(visiblePose,standing,Math.max(0,(endMotion-.85)/.15));
+    }
+    const playerX=playerOrigin+visiblePose.hipX;
+    // Desk/chair sit behind the body, leaving knees, ankles and foot plants visible.
+    rect(454,204,52,52,'#29464b',10);
+    rect(310,254,340,14,'#dac5a3',4); rect(327,268,12,38,'#203d3d'); rect(622,268,12,38,'#203d3d');
+    const appearance=game.state==='waiting'?selectedCharacter:playerCharacter;
+    const playerRig=character(playerOrigin,playerY,visiblePose,appearance==='young_female'?'#c9dcbf':'#d0deb9',playerScale,appearance);
+    rect(444,228,72,36,'#243d42',5); rect(449,233,62,26,'#477170',2);
+    text(game.state==='success' ? '업무 종료' : '업무 완료',480,250,9,'#d4edc1');
+    rect(471,263,18,9,'#233b41');
+    if(game.state!=='success')text('나',playerX,299,10,'#d2f7ad');
+    if (dodge && (effect.direction===0 || effect.direction===2)) {
+      text(effect.direction===0?'← 왼쪽으로 회피!':'오른쪽으로 회피! →',playerOrigin+playerRig.head.x,142,14,'#d2f7ad');
+    }
+    if (pose.blocking) {
+      // Readable contact arc follows the wrists; elbows, forearms and face stay visible.
+      const handsY=225+(playerRig.leftArm.end.y+playerRig.rightArm.end.y)/2;
+      ctx.save();ctx.globalAlpha=pose.guard*.8;ctx.strokeStyle='#d6ffad';ctx.lineWidth=3;
+      ctx.beginPath();ctx.arc(playerX,handsY+13,31,Math.PI*1.12,Math.PI*1.88);ctx.stroke();ctx.restore();
+      const t=reducedMotion?.66:actionAge/650;
+      const incoming=motionCurve(t,[[0,0],[.34,1],[1,1]]);
+      const scatter=motionCurve(t,[[0,0],[.42,0],[1,1]]);
+      const paperY=pose.paperY+(effect.paperStartY-78)*(1-incoming);
+      ctx.save();ctx.globalAlpha=pose.paperAlpha;
+      for (let i=0;i<3;i++) {
+        const spread=reducedMotion?.7:scatter;
+        paper(pose.paperX+(i-1)*(12+28*spread),paperY-i*(7+16*spread),pose.paperRotation+(i-1)*(.18+spread*.8));
+      }
+      ctx.restore();
+      if (pose.recoil>.4) text('탁!',playerX+49,handsY,17,'#f7d79c');
+      if (reducedMotion || t>.49) text('서류 반사! ↗',playerX+112,150,14,'#d2f7ad');
+    }
+    if (game.state==='failure') {
+      const count = Math.floor(endMotion*18);
+      for (let i=0;i<count;i++) paper(340+(i*43)%285,249-Math.floor(i/6)*21,(i%3-1)*.11);
+      text('야근 확정',480,189,18,'#ffd0b2');
+    }
+    if (game.state==='success') {
+      text('자유!',821,172,22,'#d6f8b5');
+      if (!reducedMotion) for (let i=0;i<10;i++) rect(730+i*17,40+(i*23+endMotion*130)%160,4,8,i%2?'#efc77d':'#c4f29b');
+    }
+    // Rhythm highway, always contained inside the canvas.
+    rect(236,302,488,46,'#122b31',10);
+    text('판정선',273,330,10,'#a8c2b7');
+    const laneX = [355,433,511,589];
+    for (let i=0;i<4;i++) {
+      rect(laneX[i]-29,306,58,38,'#2b484a',6);
+      text(SYMBOLS[i],laneX[i],333,24,'#a8bfb2');
+      line(laneX[i]-27,322,laneX[i]+27,322,'#c4f29b',2);
+    }
+    text(`${game.combo} COMBO`,677,330,11,'#c4f29b');
+    for (const obstacle of game.obstacles) {
+      const distance = obstacle.hitAt-game.elapsed;
+      if (distance > game.approachMs) continue;
+      const x = laneX[obstacle.direction];
+      const y = 322-distance/game.approachMs*173;
+      const inWindow = Math.abs(distance) <= DIFFICULTY_CONFIG.HIT_WINDOW_MS;
+      rect(x-23,y-15,46,30,inWindow?'#d0f4a4':'#ebc184',6);
+      text(SYMBOLS[obstacle.direction],x,y+8,24,'#203e38');
+    }
+    if (active && effect.type==='hit') {
+      ctx.strokeStyle = '#e9a489'; ctx.lineWidth = 5; ctx.strokeRect(3,3,954,348);
+      // Static border communicates damage; reduced motion excludes flashes and shake.
+    }
+    ctx.restore();
+  }
+
+  function frame(now) {
+    if (destroyed) return;
+    advance(now);
+    // DOM writes are bounded; canvas continues only one requestAnimationFrame chain.
+    const snapshot = `${game.state}:${Math.floor(game.elapsed/32)}:${game.hits}:${game.misses}`;
+    if (snapshot !== uiSnapshot) { renderHUD(); uiSnapshot = snapshot; }
+    drawScene(now);
+    if ((game.state==='success' || game.state==='failure') && !finalOverlayShown && (reducedMotion || now-terminalAt >= (game.state==='success'?2600:1100))) {
+      finalOverlayShown = true;
+      showPanel(game.state);
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+  function cleanup() {
+    destroyed = true;
+    cancelAnimationFrame(rafId);
+    window.removeEventListener('keydown',onKeyDown);
+    window.removeEventListener('keyup',onKeyUp);
+    window.removeEventListener('blur',onBlur);
+    document.removeEventListener('visibilitychange',onVisibility);
+    document.removeEventListener('fullscreenchange',syncFullscreen);
+    motionPreference.removeEventListener('change',onMotionPreference);
+    if (audioContext && audioContext.state !== 'closed') audioContext.close().catch(() => {});
+  }
+  window.addEventListener('keydown',onKeyDown,{ passive:false });
+  window.addEventListener('keyup',onKeyUp);
+  window.addEventListener('blur',onBlur);
+  document.addEventListener('visibilitychange',onVisibility);
+  motionPreference.addEventListener('change',onMotionPreference);
+  elements.start.addEventListener('click',onStart);
+  elements.pause.addEventListener('click',onPause);
+  elements.difficulty.addEventListener('change',onDifficulty);
+  elements.character.addEventListener('change',onCharacter);
+  elements.fullscreen.addEventListener('click',onFullscreen);
+  document.addEventListener('fullscreenchange',syncFullscreen);
+  elements.mute.addEventListener('click',onMute);
+  elements.motion.addEventListener('click',onMotion);
+  // pagehide preserves a paused BFCache page; non-persisted navigation releases resources.
+  window.addEventListener('pagehide',event => { onBlur(); if (!event.persisted) cleanup(); });
+  window.addEventListener('pageshow',() => { lastTime = performance.now(); });
+  syncMotionButton();
+  renderHUD();
+  rafId = requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
