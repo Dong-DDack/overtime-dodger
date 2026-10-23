@@ -71,23 +71,6 @@
   </tr>
 </table>
 
-<details>
-<summary>📸 스크린샷 넣는 방법</summary>
-
-1. 캡처한 이미지를 [`docs/screenshots/`](docs/screenshots/) 폴더에 업로드합니다.
-2. 파일 이름을 `gameplay.png`, `action.png`, `clear.png`로 지정합니다.
-3. README의 `SCREENSHOT` 주석 바로 아래 자리표시자 표를 지우고, 주석에 적힌 이미지 문법으로 교체합니다.
-
-첫 번째 이미지 예시:
-
-```md
-![게임 플레이](docs/screenshots/gameplay.png)
-```
-
-PNG·JPG·GIF를 사용할 수 있습니다. 파일 이름과 확장자를 바꾸면 README 경로도 맞춰 주세요. 16:9 비율로 캡처하면 게임 화면을 깔끔하게 담을 수 있습니다.
-
-</details>
-
 ## 조작법
 
 **방향키는 내가 움직일 방향입니다.** 동료가 다가오는 반대쪽으로 피하세요.
