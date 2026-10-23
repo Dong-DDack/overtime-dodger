@@ -39,34 +39,19 @@
 
 ## 화면 미리보기
 
-<!-- SCREENSHOT: gameplay — 아래 표를 ![게임 플레이](docs/screenshots/gameplay.png) 로 교체하세요. -->
-<table width="100%">
-  <tr>
-    <td align="center">
-      <br><br>
-      <strong>📷 GAMEPLAY</strong><br><br>
-      사무실 전체와 방향키 알림이 보이는 플레이 화면<br>
-      <sub>스크린샷이 들어갈 자리입니다.</sub>
-      <br><br><br>
-    </td>
-  </tr>
-</table>
+![게임 시작 화면 · 난이도와 플레이어 선택](docs/gameplay.png)
 
-<!-- SCREENSHOT: moments — 아래 표를 다음 이미지 두 장으로 교체하세요.
-![회피와 서류 방어](docs/screenshots/action.png)
-![정시 퇴근 성공](docs/screenshots/clear.png)
--->
 <table width="100%">
   <tr>
     <td align="center" width="50%">
-      <br><strong>🛡️ 회피 &amp; 방어</strong><br><br>
-      동료를 피하거나 서류를 튕겨내는 순간<br>
-      <sub>스크린샷 추가 예정</sub><br><br>
+      <strong>🛡️ 회피 &amp; 방어</strong><br><br>
+      <img src="docs/action.png" alt="팔을 들어 결재 서류를 튕겨내는 플레이 화면" width="100%"><br>
+      <sub>팔을 들어 서류를 막고 반사!</sub>
     </td>
     <td align="center" width="50%">
-      <br><strong>🚪 정시 퇴근 성공</strong><br><br>
-      18시를 찍고 사무실을 나서는 순간<br>
-      <sub>스크린샷 추가 예정</sub><br><br>
+      <strong>🚪 정시 퇴근 성공</strong><br><br>
+      <img src="docs/clear.png" alt="18시 정각에 68콤보로 퇴근에 성공한 화면" width="100%"><br>
+      <sub>18:00:00, 오늘 업무는 여기까지.</sub>
     </td>
   </tr>
 </table>
@@ -128,7 +113,7 @@
 | [`verify.cjs`](verify.cjs) | Node.js 내장 기능으로 실행하는 자동 검증 |
 | [`TEST_REPORT.md`](TEST_REPORT.md) | 검증 결과와 수동 테스트 항목 |
 | [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) | 판정 설정·저장 구조·유지보수 안내 |
-| [`docs/screenshots/`](docs/screenshots/) | README용 스크린샷을 넣는 폴더 |
+| [`docs/`](docs/) | 개발 문서와 README용 스크린샷 |
 
 개발 검증은 저장소 폴더에서 `node verify.cjs`로 실행합니다. 현재 자동 검증은 **35개 항목을 통과**했으며, 상세 범위와 검증 한계는 [검증 기록](TEST_REPORT.md)에 정리했습니다.
 
